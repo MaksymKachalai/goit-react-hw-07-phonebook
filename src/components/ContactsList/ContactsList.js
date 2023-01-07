@@ -1,20 +1,27 @@
-import React, { useMemo } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { fethcAllContacts } from 'redux/contactsSlice';
 import ContactsEditor from '../ContactsEditor/ContactsEditor';
 import ContactsRendering from '../ContactsRendering/ContactsRendering';
 import ContactsFilter from '../ContactsFilter/ContactsFilter';
 import './ContactsList.css';
+import { useMemo } from 'react';
 
 export default function ContactsList() {
-  const contacts = useSelector(state => state.contacts.value);
+  const contacts = useSelector(state => state.contacts.entities);
   const filter = useSelector(state => state.filter.value);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fethcAllContacts());
+  }, [dispatch]);
 
   const filteredContacts = useMemo(() => {
-    const normalizedFilter = filter.toLowerCase();
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter)
-    );
+    const data = contacts.filter(contact => {
+      return contact.name.toLowerCase().includes(filter.toLowerCase());
+    });
+    return data;
   }, [contacts, filter]);
 
   return (
